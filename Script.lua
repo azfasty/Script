@@ -10,11 +10,8 @@ local validateButton = Instance.new("TextButton")
 local getKeyButton = Instance.new("TextButton")
 local successMessage = Instance.new("TextLabel")
 local errorMessage = Instance.new("TextLabel")
-
--- Onglets et leurs contenus
 local guiTabs = Instance.new("Frame")
-local carModsTab = Instance.new("Frame")
-local sliders = {}
+local uicorner = Instance.new("UICorner")
 
 -- Fonction de création du GUI
 local function createGUI()
@@ -30,9 +27,51 @@ local function createGUI()
     mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     mainFrame.Parent = screenGui
 
+    -- Coins arrondis pour le cadre principal
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = mainFrame
+
+    -- Permettre de déplacer la fenêtre
+    local dragging
+    local dragInput
+    local dragStart
+    local startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    mainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    mainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+
     -- Bouton fermer
     closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -40, 0, 10)
+    closeButton.Position = UDim2.new(1, -30, 0, 0)
     closeButton.Text = "X"
     closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     closeButton.Parent = mainFrame
@@ -42,7 +81,7 @@ local function createGUI()
 
     -- Bouton réduire
     minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-    minimizeButton.Position = UDim2.new(1, -80, 0, 10)
+    minimizeButton.Position = UDim2.new(1, -60, 0, 0)
     minimizeButton.Text = "_"
     minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
     minimizeButton.Parent = mainFrame
@@ -62,14 +101,29 @@ local function createGUI()
     validateButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
     validateButton.Parent = mainFrame
     validateButton.MouseButton1Click:Connect(function()
-        if keyInput.Text == "VALID_KEY" then
+        if keyInput.Text == "3685" then
             successMessage.Text = "Clé valide ! Accès autorisé."
+            errorMessage.Visible = false
             successMessage.Visible = true
+            -- Afficher les onglets
             showTabs()
         else
             errorMessage.Text = "Clé invalide. Essayez encore."
+            successMessage.Visible = false
             errorMessage.Visible = true
         end
+    end)
+
+    -- Bouton Get Key
+    getKeyButton.Size = UDim2.new(0, 100, 0, 30)
+    getKeyButton.Position = UDim2.new(0.5, -50, 0.5, 0)
+    getKeyButton.Text = "Get Key"
+    getKeyButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+    getKeyButton.Parent = mainFrame
+    getKeyButton.MouseButton1Click:Connect(function()
+        setclipboard("https://linkvertise.com/your-key-page")
+        errorMessage.Text = "Le lien a été copié !"
+        errorMessage.Visible = true
     end)
 
     -- Message de succès
@@ -80,50 +134,34 @@ local function createGUI()
     successMessage.BackgroundTransparency = 1
     successMessage.Visible = false
     successMessage.Parent = mainFrame
+
+    -- Message d'erreur
+    errorMessage.Size = UDim2.new(0, 300, 0, 30)
+    errorMessage.Position = UDim2.new(0.5, -150, 0.6, 0)
+    errorMessage.Text = ""
+    errorMessage.TextColor3 = Color3.fromRGB(255, 0, 0)
+    errorMessage.BackgroundTransparency = 1
+    errorMessage.Visible = false
+    errorMessage.Parent = mainFrame
 end
 
--- Fonction pour afficher les onglets après validation
+-- Fonction pour afficher les onglets
 local function showTabs()
-    mainFrame.Visible = false
-    guiTabs.Size = UDim2.new(1, 0, 1, 0)
-    guiTabs.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    guiTabs.Name = "GuiTabs"
+    guiTabs.Size = mainFrame.Size
+    guiTabs.Position = mainFrame.Position
+    guiTabs.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     guiTabs.Parent = screenGui
 
-    -- Onglet Car Mods
-    carModsTab.Size = UDim2.new(1, 0, 1, 0)
-    carModsTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    carModsTab.Visible = true
-    carModsTab.Parent = guiTabs
-
-    createCarModsTab()
+    -- Exemple : Onglet Home
+    local homeLabel = Instance.new("TextLabel")
+    homeLabel.Size = UDim2.new(0, 300, 0, 30)
+    homeLabel.Position = UDim2.new(0.5, -150, 0.1, 0)
+    homeLabel.Text = "Bienvenue dans FLASH !"
+    homeLabel.BackgroundTransparency = 1
+    homeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    homeLabel.Parent = guiTabs
 end
 
--- Fonction pour ajouter des sliders
-local function createSlider(tab, label, min, max, default, callback)
-    local sliderFrame = Instance.new("Frame")
-    sliderFrame.Size = UDim2.new(0, 300, 0, 50)
-    sliderFrame.Position = UDim2.new(0.5, -150, #sliders * 60, 0)
-    sliderFrame.Parent = tab
-
-    local sliderLabel = Instance.new("TextLabel")
-    sliderLabel.Size = UDim2.new(0, 150, 0, 50)
-    sliderLabel.Text = label .. ": " .. default
-    sliderLabel.Parent = sliderFrame
-
-    local sliderBar = Instance.new("Frame")
-    sliderBar.Size = UDim2.new(0, 100, 0, 10)
-    sliderBar.Position = UDim2.new(0, 160, 0.5, -5)
-    sliderBar.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-    sliderBar.Parent = sliderFrame
-
-    sliderFrame.MouseButton1Down:Connect(function()
-        local value = math.random(min, max) -- Simulation
-        sliderLabel.Text = label .. ": " .. value
-        callback(value)
-    end)
-
-    table.insert(sliders, sliderFrame)
-end
-
--- Initialisation
+-- Lancer la création du GUI
 createGUI()
