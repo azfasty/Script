@@ -121,7 +121,7 @@ local function createGUI()
     getKeyButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
     getKeyButton.Parent = mainFrame
     getKeyButton.MouseButton1Click:Connect(function()
-        setclipboard("https://linkvertise.com/your-key-page")
+        setclipboard("https://direct-link.net/1255894/flashscript")
         errorMessage.Text = "Le lien a été copié !"
         errorMessage.Visible = true
     end)
