@@ -1,121 +1,61 @@
--- Script : FLASH (sans système de clé, menu corrigé)
-
--- Initialisation du GUI
 local screenGui = Instance.new("ScreenGui")
 local mainFrame = Instance.new("Frame")
-local closeButton = Instance.new("TextButton")
-local minimizeButton = Instance.new("TextButton")
-local titleLabel = Instance.new("TextLabel")
-local tabsFrame = Instance.new("Frame")
-local tabButtons = {}
-local tabs = {}
+local tabHolder = Instance.new("Frame")
+local tabs = {"Home", "Car Mods", "Multiplayer", "Player ESP", "Miscellaneous"}
 
--- Fonction de création des onglets
-local function createTab(name)
-    local tabButton = Instance.new("TextButton")
-    tabButton.Size = UDim2.new(0, 60, 0, 25)
-    tabButton.Text = name
-    tabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tabButton.Parent = tabsFrame
-
-    local tabContent = Instance.new("Frame")
-    tabContent.Size = UDim2.new(1, 0, 1, -30)
-    tabContent.Position = UDim2.new(0, 0, 0, 30)
-    tabContent.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    tabContent.Visible = false
-    tabContent.Parent = mainFrame
-
-    tabButton.MouseButton1Click:Connect(function()
-        for _, t in pairs(tabs) do
-            t.Visible = false
-        end
-        tabContent.Visible = true
-    end)
-
-    tabButtons[name] = tabButton
-    tabs[name] = tabContent
-end
-
--- Création du GUI
-screenGui.Name = "FLASH_GUI"
+-- Configurer le GUI
+screenGui.Name = "FlashGUI"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.IgnoreGuiInset = true
 
+-- Fenêtre principale
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, 300) -- Taille réduite
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-mainFrame.BorderSizePixel = 0
+mainFrame.Size = UDim2.new(0, 400, 0, 300) -- Ajuster la taille si besoin
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150) -- Centré
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.Parent = screenGui
+mainFrame.ClipsDescendants = true
+mainFrame.BackgroundTransparency = 0.1
 
--- Coins arrondis
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
-corner.Parent = mainFrame
+-- Créer le conteneur pour les onglets
+tabHolder.Name = "TabHolder"
+tabHolder.Size = UDim2.new(1, 0, 0.1, 0)
+tabHolder.Position = UDim2.new(0, 0, 0, 0)
+tabHolder.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+tabHolder.Parent = mainFrame
 
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -40, 0, 10)
-closeButton.Text = "X"
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Parent = mainFrame
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
+-- Générer les onglets automatiquement
+for i, tabName in pairs(tabs) do
+    local tab = Instance.new("TextButton")
+    tab.Name = tabName .. "Tab"
+    tab.Size = UDim2.new(0.2, 0, 1, 0) -- Divisé en 5 onglets égaux
+    tab.Position = UDim2.new((i - 1) * 0.2, 0, 0, 0)
+    tab.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    tab.Text = tabName
+    tab.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tab.Parent = tabHolder
 
-minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-minimizeButton.Position = UDim2.new(1, -80, 0, 10)
-minimizeButton.Text = "_"
-minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
-minimizeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-minimizeButton.Parent = mainFrame
-minimizeButton.MouseButton1Click:Connect(function()
-    mainFrame.Visible = not mainFrame.Visible
-end)
+    -- Action sur clic (ajouter du contenu spécifique à l'onglet ici)
+    tab.MouseButton1Click:Connect(function()
+        print(tabName .. " selected")
+        -- Ajouter du contenu spécifique ici pour chaque onglet
+    end)
+end
 
-titleLabel.Size = UDim2.new(1, 0, 0, 30)
-titleLabel.Text = "FLASH Menu"
-titleLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 18
-titleLabel.Parent = mainFrame
+-- Contenu par défaut (affiché pour l'onglet Home au départ)
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, 0, 0.9, 0)
+contentFrame.Position = UDim2.new(0, 0, 0.1, 0)
+contentFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+contentFrame.Parent = mainFrame
 
-tabsFrame.Size = UDim2.new(1, 0, 0, 30)
-tabsFrame.Position = UDim2.new(0, 0, 0, 30)
-tabsFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-tabsFrame.Parent = mainFrame
-
--- Ajout des onglets
-createTab("Home")
-createTab("Multiplayer")
-createTab("Player")
-createTab("Car Mods")
-createTab("Miscellaneous")
-createTab("ESP")
-createTab("Aimbot")
-
--- Remplir les onglets
-local homeTab = tabs["Home"]
-local homeLabel = Instance.new("TextLabel")
-homeLabel.Size = UDim2.new(1, 0, 0, 30)
-homeLabel.Position = UDim2.new(0, 0, 0, 5)
-homeLabel.Text = "Bienvenue dans FLASH"
-homeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-homeLabel.TextSize = 18
-homeLabel.BackgroundTransparency = 1
-homeLabel.Parent = homeTab
-
-local carModsTab = tabs["Car Mods"]
-local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(0, 300, 0, 30)
-speedLabel.Position = UDim2.new(0.5, -150, 0.1, 0)
-speedLabel.Text = "Modifier la vitesse de la voiture ici"
-speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedLabel.TextSize = 16
-speedLabel.BackgroundTransparency = 1
-speedLabel.Parent = carModsTab
-
--- Afficher le premier onglet par défaut
-tabs["Home"].Visible = true
+local defaultLabel = Instance.new("TextLabel")
+defaultLabel.Name = "DefaultLabel"
+defaultLabel.Size = UDim2.new(1, 0, 1, 0)
+defaultLabel.Position = UDim2.new(0, 0, 0, 0)
+defaultLabel.BackgroundTransparency = 1
+defaultLabel.Text = "Bienvenue dans l'onglet Home"
+defaultLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+defaultLabel.TextScaled = true
+defaultLabel.Parent = contentFrame
