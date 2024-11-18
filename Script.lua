@@ -1,126 +1,82 @@
--- Script : FLASH avec onglets fonctionnels
+-- Script : Brookhaven Custom GUI
 
--- Variables principales
-local player = game.Players.LocalPlayer
+-- Création du GUI
 local screenGui = Instance.new("ScreenGui")
 local mainFrame = Instance.new("Frame")
-local uiCorner = Instance.new("UICorner")
 local closeButton = Instance.new("TextButton")
 local minimizeButton = Instance.new("TextButton")
-local keyInput = Instance.new("TextBox")
-local validateButton = Instance.new("TextButton")
-local successMessage = Instance.new("TextLabel")
-local tabsFrame = Instance.new("Frame") -- Cadre pour les onglets
-local minimized = false
+local titleLabel = Instance.new("TextLabel")
+local tabsFrame = Instance.new("Frame")
+local carModsButton = Instance.new("TextButton")
 
--- Initialisation de l'interface principale
-local function createGUI()
-    screenGui.Name = "FLASH"
-    screenGui.Parent = player.PlayerGui
-    screenGui.ResetOnSpawn = false
+-- Variables pour modifier la voiture
+local vehicleSpeed = 100 -- Vitesse par défaut
+local acceleration = 50 -- Accélération par défaut
 
-    mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0, 400, 0, 300)
-    mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Parent = screenGui
+-- Configuration principale du GUI
+screenGui.Name = "BrookhavenGUI"
+screenGui.Parent = game.Players.LocalPlayer.PlayerGui
 
-    uiCorner.CornerRadius = UDim.new(0, 15)
-    uiCorner.Parent = mainFrame
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 500, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = screenGui
 
-    closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -35, 0, 5)
-    closeButton.Text = "X"
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    closeButton.Parent = mainFrame
-    local closeUICorner = Instance.new("UICorner", closeButton)
-    closeUICorner.CornerRadius = UDim.new(0, 5)
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(1, 0, 0, 50)
+titleLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+titleLabel.Text = "Brookhaven Script"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 24
+titleLabel.Parent = mainFrame
 
-    closeButton.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
-    end)
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 50, 0, 50)
+closeButton.Position = UDim2.new(1, -50, 0, 0)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 18
+closeButton.Parent = mainFrame
 
-    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-    minimizeButton.Position = UDim2.new(1, -70, 0, 5)
-    minimizeButton.Text = "_"
-    minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
-    minimizeButton.Parent = mainFrame
-    local minimizeUICorner = Instance.new("UICorner", minimizeButton)
-    minimizeUICorner.CornerRadius = UDim.new(0, 5)
+-- Onglet Car Mods
+carModsButton.Name = "CarModsButton"
+carModsButton.Size = UDim2.new(0, 150, 0, 50)
+carModsButton.Position = UDim2.new(0, 20, 0, 70)
+carModsButton.Text = "Car Mods"
+carModsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+carModsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+carModsButton.Font = Enum.Font.SourceSans
+carModsButton.TextSize = 18
+carModsButton.Parent = mainFrame
 
-    minimizeButton.MouseButton1Click:Connect(function()
-        if minimized then
-            mainFrame:TweenSize(UDim2.new(0, 400, 0, 300), "Out", "Quad", 0.3, true)
-            minimized = false
-        else
-            mainFrame:TweenSize(UDim2.new(0, 400, 0, 50), "Out", "Quad", 0.3, true)
-            minimized = true
-        end
-    end)
+-- Fonction pour modifier la vitesse de la voiture
+local function adjustVehicleSpeed()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    local vehicle = character:FindFirstChildOfClass("VehicleSeat")
 
-    keyInput.Size = UDim2.new(0, 300, 0, 30)
-    keyInput.Position = UDim2.new(0.5, -150, 0.3, 0)
-    keyInput.PlaceholderText = "Entrez votre clé"
-    keyInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    keyInput.Parent = mainFrame
-    local keyInputUICorner = Instance.new("UICorner", keyInput)
-    keyInputUICorner.CornerRadius = UDim.new(0, 5)
-
-    validateButton.Size = UDim2.new(0, 100, 0, 30)
-    validateButton.Position = UDim2.new(0.5, -50, 0.4, 0)
-    validateButton.Text = "Valider"
-    validateButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    validateButton.Parent = mainFrame
-    local validateUICorner = Instance.new("UICorner", validateButton)
-    validateUICorner.CornerRadius = UDim.new(0, 5)
-
-    validateButton.MouseButton1Click:Connect(function()
-        if keyInput.Text == "3685" then
-            successMessage.Text = "Clé valide !"
-            successMessage.Visible = true
-            mainFrame:Destroy()
-            showTabs()
-        else
-            successMessage.Text = "Clé invalide !"
-            successMessage.Visible = true
-        end
-    end)
-
-    successMessage.Size = UDim2.new(0, 300, 0, 30)
-    successMessage.Position = UDim2.new(0.5, -150, 0.5, 0)
-    successMessage.Text = ""
-    successMessage.TextColor3 = Color3.fromRGB(0, 255, 0)
-    successMessage.BackgroundTransparency = 1
-    successMessage.Visible = false
-    successMessage.Parent = mainFrame
-end
-
--- Affichage des onglets
-local function showTabs()
-    tabsFrame.Size = UDim2.new(0, 400, 0, 300)
-    tabsFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    tabsFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    tabsFrame.Parent = screenGui
-
-    local uiCorner = Instance.new("UICorner", tabsFrame)
-    uiCorner.CornerRadius = UDim.new(0, 15)
-
-    -- Création des onglets
-    local tabs = {"Home", "Car Mods", "Multiplayer", "Player ESP", "Aimbot", "Miscellaneous"}
-    for i, tab in ipairs(tabs) do
-        local tabButton = Instance.new("TextButton")
-        tabButton.Size = UDim2.new(0, 100, 0, 30)
-        tabButton.Position = UDim2.new(0, (i - 1) * 105, 0, 10)
-        tabButton.Text = tab
-        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        tabButton.Parent = tabsFrame
-        local tabUICorner = Instance.new("UICorner", tabButton)
-        tabUICorner.CornerRadius = UDim.new(0, 5)
+    if vehicle then
+        vehicle.MaxSpeed = vehicleSpeed
+        vehicle.Torque = acceleration
+        print("Vitesse du véhicule modifiée :", vehicleSpeed)
+    else
+        print("Aucun véhicule détecté.")
     end
 end
 
--- Lancer l'interface
-createGUI()
+-- Interaction avec l'onglet Car Mods
+carModsButton.MouseButton1Click:Connect(function()
+    vehicleSpeed = 200 -- Exemple : doubler la vitesse
+    acceleration = 100 -- Exemple : augmenter l'accélération
+    adjustVehicleSpeed()
+end)
+
+-- Fermeture du GUI
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
