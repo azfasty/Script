@@ -1,61 +1,30 @@
-local screenGui = Instance.new("ScreenGui")
-local mainFrame = Instance.new("Frame")
-local tabHolder = Instance.new("Frame")
-local tabs = {"Home", "Car Mods", "Multiplayer", "Player ESP", "Miscellaneous"}
+-- Script combiné de vol et de téléportations rapides
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
--- Configurer le GUI
-screenGui.Name = "FlashGUI"
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-screenGui.IgnoreGuiInset = true
+-- Désactiver la gravité pour faire voler le joueur
+humanoid.PlatformStand = true  -- Désactive les interactions physiques normales
+humanoid.UseJumpPower = false  -- Désactive la puissance de saut
 
--- Fenêtre principale
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, 300) -- Ajuster la taille si besoin
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150) -- Centré
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.Parent = screenGui
-mainFrame.ClipsDescendants = true
-mainFrame.BackgroundTransparency = 0.1
+-- Fonction de vol et de téléportations rapides
+local function flyAndTeleport()
+    while true do
+        -- Faire voler le joueur en maintenant une hauteur constante (ignorant la gravité)
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + Vector3.new(0, 10, 0)  -- Augmenter l'altitude du joueur
 
--- Créer le conteneur pour les onglets
-tabHolder.Name = "TabHolder"
-tabHolder.Size = UDim2.new(1, 0, 0.1, 0)
-tabHolder.Position = UDim2.new(0, 0, 0, 0)
-tabHolder.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-tabHolder.Parent = mainFrame
+        -- Déplacement rapide et erratique en téléportant le joueur à des positions aléatoires
+        local randomPosition = Vector3.new(
+            math.random(-1000, 1000),  -- Déplacement sur l'axe X avec des valeurs aléatoires énormes
+            50,                        -- Positionnement à une hauteur constante pour éviter de tomber
+            math.random(-1000, 1000)   -- Déplacement sur l'axe Z avec des valeurs aléatoires énormes
+        )
 
--- Générer les onglets automatiquement
-for i, tabName in pairs(tabs) do
-    local tab = Instance.new("TextButton")
-    tab.Name = tabName .. "Tab"
-    tab.Size = UDim2.new(0.2, 0, 1, 0) -- Divisé en 5 onglets égaux
-    tab.Position = UDim2.new((i - 1) * 0.2, 0, 0, 0)
-    tab.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    tab.Text = tabName
-    tab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tab.Parent = tabHolder
-
-    -- Action sur clic (ajouter du contenu spécifique à l'onglet ici)
-    tab.MouseButton1Click:Connect(function()
-        print(tabName .. " selected")
-        -- Ajouter du contenu spécifique ici pour chaque onglet
-    end)
+        humanoidRootPart.CFrame = CFrame.new(randomPosition)  -- Téléportation à une nouvelle position
+        wait(0.1)  -- Délai très court pour rendre le mouvement erratique et anormal
+    end
 end
 
--- Contenu par défaut (affiché pour l'onglet Home au départ)
-local contentFrame = Instance.new("Frame")
-contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, 0, 0.9, 0)
-contentFrame.Position = UDim2.new(0, 0, 0.1, 0)
-contentFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-contentFrame.Parent = mainFrame
-
-local defaultLabel = Instance.new("TextLabel")
-defaultLabel.Name = "DefaultLabel"
-defaultLabel.Size = UDim2.new(1, 0, 1, 0)
-defaultLabel.Position = UDim2.new(0, 0, 0, 0)
-defaultLabel.BackgroundTransparency = 1
-defaultLabel.Text = "Bienvenue dans l'onglet Home"
-defaultLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-defaultLabel.TextScaled = true
-defaultLabel.Parent = contentFrame
+-- Exécution immédiate du script
+flyAndTeleport()
