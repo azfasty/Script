@@ -1,41 +1,36 @@
+-- Chargement de la bibliothèque pour l'interface utilisateur
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 
+-- Création de la fenêtre principale
 local Window = Library.CreateLib("NEXUS", "BloodTheme")
 
-local HOME = Window:NewTab("HOME")
-local MainSection = HOME:NewSection("HOME")
+-- Création de l'onglet et de la section pour la vérification
+local HOME = Window:NewTab("NEXUS VERIFICATION")
+local MainSection = HOME:NewSection("VERIFICATION")
 
-local PLAYER = Window:NewTab("PLAYER")
+-- URL de l'API de vérification
+local API_URL = "https://your-server-url.com/check-key"
 
--- URL du fichier GitHub (modifié avec l'URL correcte)
-local GITHUB_URL = "https://raw.githubusercontent.com/azfasty/Script/main/NEXUS.lua"  -- Assurez-vous que l'URL est correcte
+-- Fonction pour vérifier une clé auprès de l'API
+local function verifyKey(key)
+    local HttpService = game:GetService("HttpService")
 
--- Fonction pour récupérer le contenu du fichier GitHub
-local function getGitHubContent()
+    -- Envoie une requête POST à l'API
     local success, response = pcall(function()
-        return game:GetService("HttpService"):GetAsync(GITHUB_URL)
+        return HttpService:PostAsync(API_URL, HttpService:JSONEncode({ key = key }), Enum.HttpContentType.ApplicationJson)
     end)
 
     if success then
-        return response
-    else
-        return nil
-    end
-end
-
--- Fonction de vérification de la clé
-local function verifyKey(key)
-    local content = getGitHubContent()
-    
-    if content then
-        -- Vérifier si la clé est présente dans le fichier GitHub
-        if string.find(content, key) then
+        -- Décodage de la réponse de l'API
+        local data = HttpService:JSONDecode(response)
+        if data.message == "Key is valid." then
             return true
         else
+            print("Server response:", data.message)
             return false
         end
     else
-        warn("Erreur lors de la récupération du fichier GitHub.")
+        warn("Error connecting to the server:", response)
         return false
     end
 end
@@ -50,11 +45,10 @@ local function createKeyInterface()
             -- Supprimer l'interface de clé
             keyBox:Destroy()
 
-            -- Afficher la vraie interface après validation de la clé
+            -- Afficher une interface de succès
             local successTab = Window:NewTab("Success")
             local successSection = successTab:NewSection("Welcome to the NEXUS")
 
-            -- Exemple de contenu de la vraie interface
             successSection:NewLabel("You have successfully entered the correct key!")
             successSection:NewButton("Do something cool", "Click me for a cool action", function()
                 print("Cool action performed!")
